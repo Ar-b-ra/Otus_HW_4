@@ -23,6 +23,13 @@ class Ship(Move):
         else:
             raise CommandException(f"Not enough fuel for this command")
 
+    def burn_fuel(self, fuel):
+        if self.fuel_level >= fuel:
+            self.fuel_level -= fuel
+        else:
+            raise CommandException(f"Not enough fuel for burn")
+
+
 
 class RotatableShip(RotatableMove):
     def __init__(self, vector: Vector, rotator: Rotate):
