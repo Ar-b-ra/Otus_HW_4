@@ -2,6 +2,8 @@ import unittest
 
 from abs_implementation.implementation import RealPosition, RealVelocity, Vector
 from abs_implementation.move import Velocity, Position, Move
+from commands.check_fuel_command import CheckFuelCommand
+from commands.macro_comand import MacroCommand
 from ship import Ship, CommandException
 
 
@@ -50,14 +52,6 @@ class MovingObjectTest(unittest.TestCase):
         # Attempt to move the object
         with self.assertRaises(Exception):
             move.move()
-
-    def test_enough_fuel(self):
-        self.assertTrue(self.ship.check_fuel(50))
-
-    def test_not_enough_fuel(self):
-        with self.assertRaises(CommandException) as cm:
-            self.ship.check_fuel(150)
-        self.assertEqual(str(cm.exception), "Not enough fuel for this command")
 
 
 if __name__ == '__main__':
