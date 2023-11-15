@@ -37,7 +37,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        coverage run --data-file tests/.coverage -m unittest -s
+        coverage run --data-file tests/.coverage -m pytest -s
         coverage json --data-file tests/.coverage -o buf/tests/coverage.json
         coverage report --data-file tests/.coverage
     - name: Upload coverage reports to Codecov
