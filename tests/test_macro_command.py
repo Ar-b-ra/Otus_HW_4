@@ -2,41 +2,40 @@ import unittest
 from unittest.mock import MagicMock
 
 from abs_implementation.implementation import RealPosition, RealVelocity, Vector
+from commands.burn_fuel_command import BurnFuelCommand
+from commands.check_fuel_command import CheckFuelCommand
 from commands.macro_comand import MacroCommand
-from ship import Ship
+from commands.move_command import MoveCommand
+from ship import Ship, CommandException
 
 
 class TestExecute(unittest.TestCase):
     def setUp(self):
-        position = RealPosition()
-        velocity = RealVelocity()
-        vector = Vector(position, velocity)
-        self.ship = Ship(vector)
+        self.ship = Ship(Vector(RealPosition(1, 2), RealVelocity(3, -4)))
 
     def test_check_fuel_with_valid_amount(self):
         # Arrange
-        ship = Ship()
-        fuel_amount_to_check = 100
-        expected_result = True
-        ship.check_fuel.return_value = expected_result
+        fuel_to_burn = 70
+        macro_command = MacroCommand()
+        macro_command.add_command(CheckFuelCommand(self.ship, fuel_to_burn))
+        macro_command.add_command(MoveCommand(self.ship))
+        macro_command.add_command(BurnFuelCommand(self.ship, fuel_to_burn))
 
-        # Act
-        result = execute(ship, fuel_amount_to_check)
+        macro_command.execute()
 
         # Assert
-        self.assertEqual(result, expected_result)
-        ship.check_fuel.assert_called_once_with(fuel_amount_to_check)
+        self.assertEqual(self.ship.get_position(), (4, -2))
 
     def test_check_fuel_with_invalid_amount(self):
-        # Arrange
-        ship = MagicMock()
-        fuel_amount_to_check = -10
-        expected_result = False
-        ship.check_fuel.return_value = expected_result
+        fuel_to_burn = 70
+        macro_command = MacroCommand()
+        macro_command.add_command(CheckFuelCommand(self.ship, fuel_to_burn))
+        macro_command.add_command(MoveCommand(self.ship))
+        macro_command.add_command(BurnFuelCommand(self.ship, fuel_to_burn))
+        macro_command.add_command(BurnFuelCommand(self.ship, fuel_to_burn))
 
-        # Act
-        result = execute(ship, fuel_amount_to_check)
-
-        # Assert
-        self.assertEqual(result, expected_result)
-        ship.check_fuel.assert_called_once_with(fuel_amount_to_check)
+        with self.assertRaises(CommandException) as cm:
+            macro_command.execute()
+        self.assertEqual(str(cm.exception), "Unable to execute command: Unable to burn fuel: Not enough fuel for burn")
+        self.assertEqual(self.ship.get_position(), (4, -2))
+        self.assertEqual(self.ship.fuel_level, 30)

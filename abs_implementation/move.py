@@ -7,10 +7,10 @@ class Move:
         self.vector = vector
 
     def move(self):
-        new_coords = self.__add_velocities_to_coordinates()
+        new_coords = self.add_velocities_to_coordinates()
         self.vector.move(new_coords)
 
-    def __add_velocities_to_coordinates(self):
+    def add_velocities_to_coordinates(self):
         current_position = self.vector.get_position()
         current_velocity = self.vector.get_velocity()
         if len(current_velocity) != len(current_position):
